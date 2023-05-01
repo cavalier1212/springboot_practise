@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    druid:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/spring_test?serverTimezone=UTC
+        username: root
+        password: root
+  profiles:
+    active: dev
+    group:
+      "dev": devMVC,devLog
+      "pro": proMVC,proLog
+logging:
+  pattern:
+    level: debug
+    
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: assign-id
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
