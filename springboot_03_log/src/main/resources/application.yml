@@ -1,0 +1,18 @@
+# debug: true
+logging:
+  # 設置分組
+  # group:
+  #   book: com.example.spring_0x_sample.controller,com.example.spring_0x_sample.service
+  level:
+    root: info
+    # 分組設定log level
+    # book: 
+    # 自訂log pattern
+  # pattern:
+  #   console: "%d %clr(%5p) --- [%16t] %clr(%-40.40c){cyan} : %m %n"
+  file:
+    name: server2.log
+  logback:
+    rollingpolicy:
+      max-file-size: 5KB
+      file-name-pattern: server2.%d{yyyy-MM-dd}.%i.log 
