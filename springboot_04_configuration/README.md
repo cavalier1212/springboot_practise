@@ -9,7 +9,7 @@
 
 `@ConfigurationProperties(prefix = "XXXXX")` 為鬆散綁定，不在乎文字間的符號(_-)、大小寫
 
-官方較建議 : kebab-case (aaa-bbb)
+官方較建議 : **kebab-case** (aaa-bbb)
 
 >`@Value` **不支持** 鬆散綁定
 
