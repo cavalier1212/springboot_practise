@@ -1,0 +1,28 @@
+
+test:
+ prop: testValue
+
+spring:
+  datasource:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/spring_test?serverTimezone=UTC
+      username: root
+      password: root
+logging:
+  pattern:
+    level: debug
+    
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: assign-id
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+test-case:
+  book:
+    id1: ${random.int}
+    id2: ${random.int(10)}
+    id3: ${random.int(11,15)}
+    name: ${random.uuid}
+    description: ${random.value}
