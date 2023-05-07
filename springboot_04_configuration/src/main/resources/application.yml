@@ -1,0 +1,16 @@
+# 自訂設定
+servers:
+#   ipAddress: 198.0.0.0
+  ip-address: 198.0.0.0
+#   ip_Address: 198.0.0.0
+#   ipADDress: 198.0.0.0
+#   ipA_dDr-ess: 198.0.0.0
+#   IPADDRESS: 198.0.0.0
+  port: 9999
+  timeout: -1
+  serverTimeout: 3
+#   dataSize: 1024
+  dataSize: 10MB
+# 自訂設定
+datasource:
+  driverClassName: com.mysql.jdbc.Driver123
