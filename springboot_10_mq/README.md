@@ -37,7 +37,7 @@
 服務port: 61616,  管理後台port: 8161
 username&password : admin
 
-Queses : 一般對列
+Queses : 一般對列  
 Topics : 訂閱模式
 
 ## RabbitMQ
@@ -85,3 +85,44 @@ username&password : guest
 * 可異步...等等設定
 * nameServe對多部broker 附載平衡
 * spring boot 沒有維護版本，需另外加dependency
+
+## Kafka
+
+* 需安裝本地應用程式
+
+### 設定
+```xml
+<dependency>
+  <groupId>org.springframework.kafka</groupId>
+  <artifactId>spring-kafka</artifactId>
+</dependency>
+```
+
+```yaml
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    # for listener
+    consumer:
+      group-id: order_name
+```
+### 發送
+```java
+@Autowired
+private KafkaTemplate<String,String> kafkaTemplate;
+
+@Override
+public void sendMessage(String id) {
+    System.out.println("待發送短信的訂單已納入處理對列. id = "+ id);
+    kafkaTemplate.send("topic_kafka", id);
+}
+```
+### 接收
+
+```java
+@KafkaListener(topics = "topic_kafka")
+public void onMessage(ConsumerRecord<String, String> record) {
+    System.out.println("已完成短信發送業務(kafka), id = "+record.value());
+
+}
+```
