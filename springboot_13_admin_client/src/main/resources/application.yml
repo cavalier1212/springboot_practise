@@ -1,0 +1,43 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    druid:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/spring_test?serverTimezone=UTC
+        username: root
+        password: 
+  boot:
+    admin:
+      client:
+      # 被誰監控
+        url: http://localhost
+management:
+  # 上級控制 這邊不開放 endpoints 拿不到
+  endpoint:
+    # 基本health 必須
+    health:
+      show-details: always
+  endpoints:
+    web: # web 開放控制
+      exposure:
+      # 開放監控
+        include: '*'  # 預設health, * 全部
+    enabled-by-default: true # 預設true, 開放給jconsole(終端輸入 jconsole)
+
+info:
+  author: your name
+  appName: @project.artifactId@
+  version: @project.version@
+
+logging:
+  pattern:
+    level: debug
+
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: assign-id
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

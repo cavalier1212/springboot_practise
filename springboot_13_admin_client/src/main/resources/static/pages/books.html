@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>圖書管理</title>
+    <link rel="shortcut icon" href="../images/book-stack.png" type="image/x-icon">
+    <!-- 引入 Vue.js 的 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+
+    <!-- 引入 axios 的 CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"
+        integrity="sha512-LUKzDoJKOLqnxGWWIBM4lzRBlxcva2ZTztO8bTcWPmDSpkErWx0bSP4pdsjNH8kiHAUPaT06UXcb+vOEZH+HpQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .container {
+            margin: 20px 20px 50px 20px;
+        }
+
+        .search-box {
+            display: flex;
+            margin: 10px;
+        }
+
+        .margin-5 {
+            margin: 5px;
+        }
+
+        .el-divider--horizontal {
+            background-color: #6287ffa3;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" class="container">
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <h1>圖書管理</h1>
+            </div>
+        </div>
+
+        <el-divider></el-divider>
+
+        <!-- 查詢區塊 -->
+        <div class="search-box">
+            <el-input v-model="pagination.type" placeholder="類別" class="margin-5"
+                prefix-icon="el-icon-search"></el-input>
+            <el-input v-model="pagination.name" placeholder="名稱" class="margin-5"
+                prefix-icon="el-icon-search"></el-input>
+            <el-input v-model="pagination.description" placeholder="敘述" class="margin-5"
+                prefix-icon="el-icon-search"></el-input>
+            <el-button type="primary" class="margin-5" @click="getPages">查詢</el-button>
+            <el-button type="primary" class="margin-5" @click="handleCreate">創建</el-button>
+        </div>
+
+        <el-divider></el-divider>
+
+        <!-- 列表區塊 -->
+        <template>
+            <el-table current-row-key="id" :data="dataList" style="width: 100%">
+                <el-table-column label="序號" type="index" align="center"></el-table-column>
+                <el-table-column label="類別" prop="type"></el-table-column>
+                <el-table-column label="名稱" prop="name"></el-table-column>
+                <el-table-column label="敘述" prop="description"></el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button type="primary" @click="handleEdit(scope.row)">編輯</el-button>
+                        <el-button type="danger" @click="handleDelete(scope.row)">刪除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </template>
+
+        <el-divider></el-divider>
+
+        <!-- 分頁區塊 -->
+        <el-row class="pt-3">
+            <el-pagination class="pagination" @current-change="handlePageChange" :current-page="pagination.currentPage"
+                :page-size="pagination.pageSize" layout="total,prev,pager,next,jumper"
+                :total="pagination.total"></el-pagination>
+        </el-row>
+
+        <!-- 彈窗 -->
+        <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible">
+            <el-form :model="formData" :rules="rules" ref="formData">
+                <el-form-item label="序號" v-if="formData.id">
+                    <el-input v-model="formData.id" :disabled="isDisabled"></el-input>
+                </el-form-item>
+                <el-form-item label="類別" prop="type">
+                    <el-input v-model="formData.type" ref="typeInput"></el-input>
+                </el-form-item>
+                <el-form-item label="名稱" prop="name">
+                    <el-input v-model="formData.name" ref="nameInput"></el-input>
+                </el-form-item>
+                <el-form-item label="敘述" prop="description">
+                    <el-input v-model="formData.description" ref="descriptionInput"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="cancel">取消</el-button>
+                <el-button type="primary" @click="handleSave(formData.id?'put':'post')">確定</el-button>
+            </div>
+        </el-dialog>
+    </div>
+
+
+
+    <script>
+        const axiosInstance = axios.create({
+            baseURL: 'http://localhost:8080',
+        });
+        var app = new Vue({
+            el: '#app',
+            data: {
+                dialogTitle: '編輯',
+                pagination: {
+                    currentPage: 1,
+                    pageSize: 10,
+                    total: 0,
+                    type: '',
+                    name: '',
+                    description: ''
+                },
+                dataList: [], // 當前展示的列表數據
+                dialogFormVisible: false, // 添加表單是否可見
+                isDisabled: true,
+                formData: {}, // 表單數據
+                rules: {
+                    type: [
+                        { required: true, message: '請輸入類別', trigger: 'blur' }
+                    ],
+                    name: [
+                        { required: true, message: '請輸入名稱', trigger: 'blur' }
+                    ]
+                },
+                pagination: {
+                    currentPage: 1,
+                    pageSize: 10,
+                    total: 0
+                },
+            },
+            created() {
+                this.getPages();
+            },
+            methods: {
+                getAll() {
+                    axiosInstance.get('/books')
+                        .then(response => {
+                            // handle the response data
+                            this.dataList = response.data.data;
+                        })
+                        .catch(error => {
+                            // handle the error
+                            console.log(error);
+                        });
+                },
+                getPages() {
+                    axiosInstance.get(`/books/${this.pagination.currentPage}/${this.pagination.pageSize}`, {
+                        params: {
+                            type: this.pagination.type,
+                            name: this.pagination.name,
+                            description: this.pagination.description,
+                        }
+                    }).then(response => {
+                        this.dataList = response.data.data.records;
+                        this.pagination.total = response.data.data.total;
+                        this.pagination.pageSize = response.data.data.size;
+                        this.pagination.currentPage = response.data.data.current;
+                        console.log("🚀 ~ file: books.html:194 ~ axiosInstance.get ~ response.data.data:", response.data.data)
+                        console.log("🚀 ~ file: books.html:194 ~ axiosInstance.get ~ this.dataList:", this.dataList)
+                    })
+                },
+                handleCreate() {
+                    this.dialogFormVisible = true;
+                    this.isDisabled = false;
+                    this.dialogTitle = '創建';
+
+                },
+                handleEdit(formData) {
+                    console.log('handleEdit', formData)
+                    this.formData = formData;
+                    this.dialogFormVisible = true;
+                    this.isDisabled = true;
+                    this.dialogTitle = '編輯';
+                },
+                validateForm() {
+                    return new Promise((resolve, reject) => {
+                        this.$refs.formData.validate(valid => {
+                            if (valid) {
+                                resolve()
+                            } else {
+                                reject(new Error('表單驗證未通過'))
+                            }
+                        })
+                    })
+                },
+                async handleSave(methodType) {
+                    try {
+                        await this.validateForm()
+                        // 表单验证通过，可以提交表单
+                        const response = await axiosInstance[methodType]('/books', this.formData);
+                        console.log(response.data);
+                        if (response.data.flag) {
+                            this.resetForm();
+                            this.$message.success(response.data.msg);
+                        } else {
+                            this.$message.success(response.data.msg);
+                        }
+                    } catch (error) {
+                        console.error(error)
+                        this.$nextTick(() => this.errorHandler(error));
+                    } finally {
+                        this.getPages();
+                    }
+                },
+                resetForm() {
+                    this.dialogFormVisible = false;
+                    this.formData = {};
+                },
+                cancel() {
+                    this.resetForm();
+                    this.$message.info("取消操作")
+                },
+                async handleDelete(row) {
+                    try {
+                        await this.$confirm('Are you sure you want to delete', '提示', { type: 'warning' });
+                        const { data } = await axiosInstance.delete(`/books/${row.id}`);
+                        console.log(data);
+                        if (data.flag) {
+                            this.$message.success('刪除成功');
+                            this.getPages();
+                        } else {
+                            this.$message.error('刪除失敗');
+                        }
+                    } catch (error) {
+                        console.warn(error);
+                    }
+                }, errorHandler(error) {
+                    console.error(error);
+                    this.$message.error(error.message || '發生錯誤');
+                },
+                handlePageChange(currentPage) {
+                    this.pagination.currentPage = currentPage;
+                    this.getPages();
+                },
+                handleSearch() { },
+            }
+
+        })
+    </script>
+</body>
+
+</html>
