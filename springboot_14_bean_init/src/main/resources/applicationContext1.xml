@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+	<!--  load  the properties file:sport.properties -->
+	<!-- <context:property-placeholder location="classpath:sport.properties"/> -->
+	<!--Define your beans here-->
+    <!-- inject values from properties file -->
+	<!-- <bean id="cricket" class="com.poc.bean.Cricket">
+		<property name="teamName" value="${sport.team}"/>
+		<property name="match" value="${sport.match}"/>
+	</bean> -->
+
+    <!-- 手動XML設定 自己的bean -->
+    <bean id="bookService" 
+        class="com.example.bean.service.impl.BookServiceImpl1"
+        scope="singleton"></bean>
+        <!-- 手動XML設定 外部bean -->
+        <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"></bean>
+
+</beans>
