@@ -73,3 +73,42 @@ public class App {
 4. 條件檢符合則去加載該技術的properties,Bean
 
 5. 切記是先加載所有的外部資源，然後根據外部資源進行條件比對
+
+## 模擬用spring.factories自動裝配
+
+* spring.factories
+> * Spring Boot 3 不支持!!!
+```text
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    com.example.springboot_16_bean_propertise.bean.CartoonCatAndMouse
+```
+
+* 移除@Import(CartoonCatAndMouse.class)
+
+```java
+@SpringBootApplication
+// 排除裝配
+// @Import(CartoonCatAndMouse.class)
+public class App {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext ctx = SpringApplication.run(App.class, args);;
+		CartoonCatAndMouse cartoon = ctx.getBean(CartoonCatAndMouse.class);
+		cartoon.run();
+	}
+}
+```
+
+* 排除裝配
+
+```yaml
+spring:
+  autoconfigure:
+    exclude:
+    - com.example.springboot_16_bean_propertise.bean.CartoonCatAndMouse
+```
+
+```java
+@SpringBootApplication(excludeName = "com.example.springboot_16_bean_propertise.bean.CartoonCatAndMouse")
+```

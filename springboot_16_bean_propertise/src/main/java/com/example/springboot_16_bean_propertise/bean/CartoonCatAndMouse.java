@@ -1,4 +1,4 @@
-package bean;
+package com.example.springboot_16_bean_propertise.bean;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
