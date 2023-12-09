@@ -1,0 +1,8 @@
+cartoon:
+    cat:
+        name: "cat2"
+        age: 6
+    mouse:
+        name: "mouse2"
+        age: 3
+
