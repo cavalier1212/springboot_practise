@@ -6,3 +6,7 @@ cartoon:
         name: "mouse2"
         age: 3
 
+# spring:
+#   autoconfigure:
+#     exclude:
+#     - com.example.springboot_16_bean_propertise.bean.CartoonCatAndMouse
