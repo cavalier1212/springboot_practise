@@ -32,6 +32,8 @@
   * 優先序高於jar 檔同層application設定檔
   * **運維組長**
   * 最高級別
+ 
+[設定讀取優先序 - 官網](https://docs.spring.io/spring-boot/docs/1.5.9.RELEASE/reference/htmlsingle/#boot-features-external-config)
 
 >開發環境檔案結構也適用(專案同層)
 
